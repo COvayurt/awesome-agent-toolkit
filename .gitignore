@@ -1,0 +1,24 @@
+# Environment files (contain secrets)
+.env
+*.env.local
+
+# Node
+node_modules/
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Test output
+.sonar-state.json
+.sonar-tracking.json
