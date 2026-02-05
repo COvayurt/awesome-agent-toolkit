@@ -28,7 +28,7 @@ Universal plugins for AI coding agents — write once, run on Claude, Gemini, Co
 /plugin marketplace add covayurt/awesome-agent-toolkit
 
 # Install plugin
-/plugin install sonarqube
+/plugin install sonarqube@awesome-agent-toolkit
 ```
 
 Or test locally:
