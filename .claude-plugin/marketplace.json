@@ -19,6 +19,38 @@
         "code-quality",
         "static-analysis"
       ]
+    },
+    {
+      "name": "gitlab-mr",
+      "source": "./adapters/claude",
+      "description": "GitLab Merge Request integration - list MRs, read comments, post feedback, resolve discussions",
+      "version": "1.0.0",
+      "author": {
+        "name": "COVayurt"
+      },
+      "license": "MIT",
+      "keywords": [
+        "gitlab",
+        "merge-request",
+        "code-review",
+        "collaboration"
+      ]
+    },
+    {
+      "name": "gitlab-issues",
+      "source": "./adapters/claude",
+      "description": "GitLab Issues integration - list issues, manage comments, update descriptions, assign milestones and people, create MRs",
+      "version": "1.0.0",
+      "author": {
+        "name": "COVayurt"
+      },
+      "license": "MIT",
+      "keywords": [
+        "gitlab",
+        "issues",
+        "project-management",
+        "collaboration"
+      ]
     }
   ]
 }

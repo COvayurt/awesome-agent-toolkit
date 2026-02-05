@@ -3,6 +3,10 @@
     "sonarqube": {
       "command": "node",
       "args": ["./core/sonarqube/mcp-server/index.js"]
+    },
+    "gitlab-mr": {
+      "command": "node",
+      "args": ["./core/gitlab/mcp-server/index.js"]
     }
   }
 }
