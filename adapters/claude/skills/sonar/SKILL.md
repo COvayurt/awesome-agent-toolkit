@@ -1,105 +1,94 @@
 ---
 name: sonar
-description: Process SonarQube issue JSON and extract actionable tasks. Use when user pastes SonarQube JSON export or mentions SonarQube issues.
+description: SonarQube integration - fetch issues, check quality gate, view metrics, review security hotspots, explain rules.
 ---
 
-# SonarQube Issue Processor
+# SonarQube Integration
 
-Process SonarQube issue JSON and extract actionable tasks.
+## Available Commands
 
-## Instructions
+| Command | Description |
+|---------|-------------|
+| Fetch issues | Get code quality issues by severity |
+| Quality gate | Check if project passes/fails |
+| Metrics | View coverage, duplications, complexity |
+| Security hotspots | Review security issues |
+| Rule details | Explain what a rule means |
+| Run analysis | Execute SonarQube scan |
 
-When this skill is invoked, check if the user has provided JSON input.
+## Keyword Detection
 
-### Fetching Issues from SonarQube
+The hook auto-triggers on these keywords:
+- `sonar`, `fix issue`, `code smell`, `bug scan`, `quality gate`
 
-The hook scripts can fetch issues directly from SonarQube. The prompt hook automatically detects keywords in the user's prompt:
+### Severity filters
+- `blocker` → BLOCKER
+- `high` / `critical` → HIGH
+- `medium` → MEDIUM
+- `low` → LOW
+- `info` → INFO
+- `new code` → new code period only
 
-- **Default fetch**: Triggered by keywords like "sonar", "fix issue", "code smell", "bug scan", "quality gate". Fetches HIGH,MEDIUM severity issues from the overall codebase.
-- **Severity detection**: The hook detects severity keywords in the prompt and filters accordingly:
-  - "blocker" → `BLOCKER`
-  - "high" or "critical" → `HIGH`
-  - "medium" → `MEDIUM`
-  - "low" → `LOW`
-  - "info" → `INFO`
-  - No keyword → defaults to `HIGH,MEDIUM`
-- **New code fetch**: Triggered when the prompt also contains "new code". Uses SonarQube's `inNewCodePeriod=true` parameter.
+## Workflows
 
-### No JSON Provided
+### Fetch & Fix Issues
 
-If the user invokes `/sonarqube:sonar` without any JSON (empty message or just the command), respond exactly:
+When user asks about sonar issues:
+1. Fetch issues with appropriate severity filter
+2. Present as table: File | Line | Rule | Message | Severity
+3. Ask which to fix
+4. For each issue:
+   - Read file at specified line
+   - Apply fix
+   - Move to next
+5. Run build after fixes
 
+### Quality Gate Check
+
+When user asks about quality gate:
+1. Fetch quality gate status
+2. Report: PASSED, FAILED, or ERROR
+3. If failed, show which conditions failed
+
+### View Metrics
+
+When user asks about metrics/coverage:
+1. Fetch project metrics
+2. Present key metrics:
+   - Coverage %
+   - Duplications %
+   - Bugs / Vulnerabilities / Code Smells count
+   - Complexity
+
+### Security Hotspots
+
+When user asks about security:
+1. Fetch hotspots with TO_REVIEW status
+2. Present as table with vulnerability category
+3. Review each hotspot and recommend action
+
+### Rule Explanation
+
+When user asks "what does rule X mean" or "explain rule X":
+1. Fetch rule details using rule key (e.g., java:S2140)
+2. Present:
+   - Rule name and description
+   - Why it matters
+   - How to fix (with examples if available)
+
+## Response Format
+
+### Issue Table
 ```
-Please paste your SonarQube JSON export.
-
-Expected format: The JSON should contain an `"issues"` array from SonarQube's API or export.
+| # | File | Line | Rule | Message | Severity |
+|---|------|------|------|---------|----------|
+| 1 | `File.java` | 42 | java:S2140 | Use nextInt() | HIGH |
 ```
 
-Then wait for the user to paste the JSON.
-
-### JSON Provided
-
-When the user provides SonarQube JSON, parse it and follow these steps exactly:
-
-### Step 1: Validate JSON Structure
-
-Confirm the JSON has:
-- `"issues"` array at root level
-- Each issue contains: `rule`, `component`, `line`, `message`, `impacts` (array with `severity` and `softwareQuality`)
-- Optional: `"components"` array for file path mapping
-
-If invalid, respond: "This doesn't appear to be valid SonarQube JSON. Please paste the full JSON export."
-
-### Step 2: Extract File Paths
-
-For each issue's `component` field:
-1. Look up the full path in the `components` array using the `key` field
-2. Use the `path` or `longName` field for the relative file path
-3. Extract just the filename for the summary table
-
-### Step 3: Output Summary Table
-
-If there are multiple issues, first output:
-
+### After Listing Issues
 ```
-**SonarQube Issues Found: [total count]**
-
-| # | File | Line | Issue | Impact Severity | Software Quality |
-|---|------|------|-------|-----------------|------------------|
-| 1 | `FileName.java` | 123 | Brief message (truncate to ~50 chars) | HIGH | RELIABILITY |
-```
-
-### Step 4: Output Detailed Tasks
-
-For each issue, output:
-
-```
----
-
-**Task [N]:** In `[filename]`, SonarQube found **"[full message]"** at line **[line]**.
-- Path: `[full relative path]`
-- Rule: `[rule]`
-- Impact Severity: [impacts[0].severity]
-- Software Quality: [impacts[0].softwareQuality]
-```
-
-### Step 5: Prompt for Action
-
-End with exactly:
-
-```
----
-
 **Ready to fix?** Reply with:
-- Task numbers to fix (e.g., `1, 3, 5`)
+- Task numbers (e.g., `1, 3, 5`)
 - `all` to fix everything
-- `skip` to just keep this list for reference
+- `skip` to keep for reference
 ```
-
-## When User Selects Tasks to Fix
-
-1. Create a todo list with selected issues
-2. Read the file at the specified line for each issue
-3. Fix issues one by one, marking todos complete as you go
-4. After all fixes, run your project's build command
-5. If build fails, fix compilation errors before completing

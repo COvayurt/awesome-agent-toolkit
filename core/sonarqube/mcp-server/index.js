@@ -65,6 +65,73 @@ server.setRequestHandler("tools/list", async () => {
         description: "Run SonarQube analysis on the current project (requires Gradle)"
       },
       {
+        name: "sonar_quality_gate",
+        description: "Check quality gate status - returns PASSED, FAILED, or ERROR",
+        inputSchema: {
+          type: "object",
+          properties: {
+            branch: {
+              type: "string",
+              description: "Branch name to check (optional, defaults to main branch)"
+            }
+          }
+        }
+      },
+      {
+        name: "sonar_metrics",
+        description: "Fetch project metrics like coverage, duplications, complexity, bugs count",
+        inputSchema: {
+          type: "object",
+          properties: {
+            metrics: {
+              type: "string",
+              description: "Comma-separated metric keys (e.g., coverage,bugs,code_smells). Defaults to common metrics."
+            },
+            branch: {
+              type: "string",
+              description: "Branch name (optional)"
+            }
+          }
+        }
+      },
+      {
+        name: "sonar_hotspots",
+        description: "Fetch security hotspots that need review",
+        inputSchema: {
+          type: "object",
+          properties: {
+            status: {
+              type: "string",
+              enum: ["TO_REVIEW", "REVIEWED"],
+              description: "Filter by review status",
+              default: "TO_REVIEW"
+            },
+            file: {
+              type: "string",
+              description: "Filter to a specific file"
+            },
+            branch: {
+              type: "string",
+              description: "Branch name (optional)"
+            }
+          }
+        }
+      },
+      {
+        name: "sonar_rule_details",
+        description: "Get detailed explanation of a SonarQube rule including description and fix examples",
+        inputSchema: {
+          type: "object",
+          properties: {
+            rule: {
+              type: "string",
+              description: "Rule key (e.g., java:S2140, python:S1234)"
+            }
+          },
+          required: ["rule"]
+        }
+      },
+      {
         name: "sonar_format_issues",
         description: "Format SonarQube JSON response as a readable markdown table",
         inputSchema: {
@@ -96,10 +163,7 @@ server.setRequestHandler("tools/call", async (request) => {
 
         const result = execSync(
           `bash "${join(SCRIPTS_DIR, "fetch-issues.sh")}" ${cmdArgs.join(" ")}`,
-          {
-            encoding: "utf-8",
-            env: process.env
-          }
+          { encoding: "utf-8", env: process.env }
         );
         return { content: [{ type: "text", text: result }] };
       }
@@ -107,11 +171,54 @@ server.setRequestHandler("tools/call", async (request) => {
       case "sonar_run_analysis": {
         const result = execSync(
           `bash "${join(SCRIPTS_DIR, "run-analysis.sh")}"`,
-          {
-            encoding: "utf-8",
-            env: process.env,
-            cwd: process.cwd()
-          }
+          { encoding: "utf-8", env: process.env, cwd: process.cwd() }
+        );
+        return { content: [{ type: "text", text: result }] };
+      }
+
+      case "sonar_quality_gate": {
+        const cmdArgs = [];
+        if (args?.branch) cmdArgs.push("--branch", args.branch);
+
+        const result = execSync(
+          `bash "${join(SCRIPTS_DIR, "quality-gate.sh")}" ${cmdArgs.join(" ")}`,
+          { encoding: "utf-8", env: process.env }
+        );
+        return { content: [{ type: "text", text: result }] };
+      }
+
+      case "sonar_metrics": {
+        const cmdArgs = [];
+        if (args?.metrics) cmdArgs.push("--metrics", args.metrics);
+        if (args?.branch) cmdArgs.push("--branch", args.branch);
+
+        const result = execSync(
+          `bash "${join(SCRIPTS_DIR, "metrics.sh")}" ${cmdArgs.join(" ")}`,
+          { encoding: "utf-8", env: process.env }
+        );
+        return { content: [{ type: "text", text: result }] };
+      }
+
+      case "sonar_hotspots": {
+        const cmdArgs = [];
+        if (args?.status) cmdArgs.push("--status", args.status);
+        if (args?.file) cmdArgs.push("--file", args.file);
+        if (args?.branch) cmdArgs.push("--branch", args.branch);
+
+        const result = execSync(
+          `bash "${join(SCRIPTS_DIR, "hotspots.sh")}" ${cmdArgs.join(" ")}`,
+          { encoding: "utf-8", env: process.env }
+        );
+        return { content: [{ type: "text", text: result }] };
+      }
+
+      case "sonar_rule_details": {
+        if (!args?.rule) {
+          return { content: [{ type: "text", text: "Error: rule argument is required (e.g., java:S2140)" }] };
+        }
+        const result = execSync(
+          `bash "${join(SCRIPTS_DIR, "rule-details.sh")}" --rule "${args.rule}"`,
+          { encoding: "utf-8", env: process.env }
         );
         return { content: [{ type: "text", text: result }] };
       }
@@ -122,11 +229,7 @@ server.setRequestHandler("tools/call", async (request) => {
         }
         const result = execSync(
           `python3 "${join(SCRIPTS_DIR, "format-issues.py")}"`,
-          {
-            input: args.json,
-            encoding: "utf-8",
-            env: process.env
-          }
+          { input: args.json, encoding: "utf-8", env: process.env }
         );
         return { content: [{ type: "text", text: result }] };
       }

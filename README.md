@@ -15,7 +15,7 @@ Universal plugins for AI coding agents — write once, run on Claude, Gemini, Co
 
 | Plugin | Description |
 |--------|-------------|
-| [sonarqube](./core/sonarqube/) | Fetch issues, run analysis, auto-fix code quality |
+| [sonarqube](./core/sonarqube/) | Code quality, security hotspots, metrics, quality gates |
 
 ---
 
@@ -36,36 +36,12 @@ Or test locally:
 claude --plugin-dir /path/to/awesome-agent-toolkit/adapters/claude
 ```
 
-### Gemini CLI
+### Other Agents
 
 ```bash
-# Copy context file
-cp adapters/gemini/GEMINI.md /your/project/
-
-# Add MCP server to ~/.gemini/settings.json
-```
-
-### Codex CLI
-
-```bash
-# Copy skill
-cp adapters/codex/skills/sonar.md ~/.codex/skills/
-
-# Add MCP config to ~/.codex/config.toml
-```
-
-### Cursor
-
-```bash
-# Copy rules and MCP config
-cp adapters/cursor/.cursorrules /your/project/
-cp adapters/cursor/mcp.json /your/project/.cursor/
-```
-
-### Manual Install (Any Agent)
-
-```bash
-./install.sh sonarqube claude   # or: gemini, codex, cursor
+./install.sh sonarqube gemini   # Gemini CLI
+./install.sh sonarqube codex    # Codex CLI
+./install.sh sonarqube cursor   # Cursor
 ```
 
 ---
@@ -82,27 +58,43 @@ SONAR_PROJECT_KEY=my-project
 
 ---
 
-## Usage
-
-### Claude Code
-
-```
-/sonarqube:sonar              # invoke skill directly
-show me sonar issues          # hook auto-triggers
-fix high severity issues      # severity filter
-```
-
-### MCP Tools (All Agents)
+## MCP Tools
 
 | Tool | Description |
 |------|-------------|
-| `sonar_fetch_issues` | Fetch open issues (params: severity, newCode, file) |
-| `sonar_run_analysis` | Run SonarQube scan |
-| `sonar_format_issues` | Format JSON as markdown |
+| `sonar_fetch_issues` | Fetch open issues (severity, newCode, file) |
+| `sonar_quality_gate` | Check if project passes/fails quality gate |
+| `sonar_metrics` | Get coverage, duplications, complexity, bugs count |
+| `sonar_hotspots` | Fetch security hotspots to review |
+| `sonar_rule_details` | Get rule explanation and fix examples |
+| `sonar_run_analysis` | Run SonarQube scan via Gradle |
 
-### Severity Keywords
+---
 
-`blocker` · `high` · `medium` · `low` · `info` · `new code`
+## Usage Examples
+
+```
+# Issues
+show me sonar issues
+fix high severity issues
+fetch blocker issues for new code
+
+# Quality gate
+check quality gate status
+is the quality gate passing?
+
+# Metrics
+show project metrics
+what's the code coverage?
+
+# Security
+show security hotspots
+review security hotspots
+
+# Rules
+explain rule java:S2140
+what does rule python:S1234 mean?
+```
 
 ---
 
@@ -110,13 +102,14 @@ fix high severity issues      # severity filter
 
 ```
 awesome-agent-toolkit/
-├── core/                    # Agent-agnostic (scripts + MCP server)
-│   └── sonarqube/
-├── adapters/                # Agent-specific configs
-│   ├── claude/
-│   ├── gemini/
-│   ├── codex/
-│   └── cursor/
+├── core/sonarqube/
+│   ├── scripts/           # fetch-issues, quality-gate, metrics, hotspots, rule-details
+│   └── mcp-server/        # Universal MCP server
+├── adapters/
+│   ├── claude/            # Plugin, skills, hooks
+│   ├── gemini/            # GEMINI.md, mcp-config
+│   ├── codex/             # Skills
+│   └── cursor/            # .cursorrules
 └── install.sh
 ```
 
