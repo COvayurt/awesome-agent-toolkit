@@ -1,0 +1,11 @@
+{
+  "name": "sonarqube",
+  "description": "SonarQube integration - fetch issues, run analysis, auto-inject context into prompts",
+  "version": "1.0.0",
+  "author": {
+    "name": "COVayurt"
+  },
+  "repository": "https://github.com/covayurt/awesome-agent-toolkit",
+  "license": "MIT",
+  "keywords": ["sonarqube", "code-quality", "static-analysis"]
+}
