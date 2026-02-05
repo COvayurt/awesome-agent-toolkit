@@ -1,21 +1,24 @@
 {
   "name": "awesome-agent-toolkit",
-  "description": "A toolkit of AI agent integrations including SonarQube code quality analysis",
-  "version": "1.0.0",
   "owner": {
     "name": "COVayurt",
-    "url": "https://github.com/covayurt"
+    "email": "canberk.ovayurt@gmail.com"
   },
-  "repository": "https://github.com/covayurt/awesome-agent-toolkit",
-  "license": "MIT",
   "plugins": [
     {
       "name": "sonarqube",
+      "source": "./adapters/claude",
       "description": "SonarQube integration - fetch issues, run analysis, auto-inject context into prompts",
-      "source": {
-        "type": "local",
-        "path": "adapters/claude"
-      }
+      "version": "1.0.0",
+      "author": {
+        "name": "COVayurt"
+      },
+      "license": "MIT",
+      "keywords": [
+        "sonarqube",
+        "code-quality",
+        "static-analysis"
+      ]
     }
   ]
 }
