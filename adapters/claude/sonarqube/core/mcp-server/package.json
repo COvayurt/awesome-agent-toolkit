@@ -1,0 +1,25 @@
+{
+  "name": "@devforge/sonarqube-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for SonarQube integration - works with Claude, Gemini, Codex, and Cursor",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "sonarqube-mcp": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "sonarqube",
+    "claude",
+    "gemini",
+    "codex",
+    "cursor"
+  ],
+  "license": "MIT"
+}

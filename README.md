@@ -1,21 +1,21 @@
 # Awesome Agent Toolkit
 
-Universal plugins for AI coding agents — write once, run on Claude, Gemini, Codex, Cursor, and more.
+Universal plugins for AI coding agents — SonarQube and GitLab integrations.
 
 ## Supported Agents
 
-| Agent | MCP | Native Features |
-|-------|-----|-----------------|
-| Claude Code | ✅ | Plugins, Skills, Hooks |
-| Gemini CLI | ✅ | Extensions, GEMINI.md |
-| Codex CLI | ✅ | Skills |
-| Cursor | ✅ | .cursorrules |
+| Agent | Skills | Hooks |
+|-------|--------|-------|
+| Claude Code | ✅ | ✅ |
+| Codex CLI | ✅ | - |
 
 ## Plugins
 
 | Plugin | Description |
 |--------|-------------|
 | [sonarqube](./core/sonarqube/) | Code quality, security hotspots, metrics, quality gates |
+| [gitlab-issues](./core/gitlab/) | List issues, manage comments, assign people, create MRs |
+| [gitlab-mr](./core/gitlab/) | List MRs, review comments, resolve discussions |
 
 ---
 
@@ -25,75 +25,55 @@ Universal plugins for AI coding agents — write once, run on Claude, Gemini, Co
 
 ```bash
 # Add marketplace (one-time)
-/plugin marketplace add covayurt/awesome-agent-toolkit
+/plugin marketplace add COVayurt/awesome-agent-toolkit
 
-# Install plugin
+# Install plugins
 /plugin install sonarqube@awesome-agent-toolkit
+/plugin install gitlab-issues@awesome-agent-toolkit
+/plugin install gitlab-mr@awesome-agent-toolkit
 ```
 
-Or test locally:
-```bash
-claude --plugin-dir /path/to/awesome-agent-toolkit/adapters/claude
+### Configuration
+
+Add environment variables to `~/.claude/settings.json`:
+
+```json
+{
+  "env": {
+    "SONAR_HOST_URL": "https://sonarqube.example.com",
+    "SONAR_TOKEN": "sqa_xxxxxxxxxxxxx",
+    "SONAR_PROJECT_KEY": "my-project",
+    "GITLAB_HOST_URL": "https://gitlab.com",
+    "GITLAB_TOKEN": "glpat-xxxxxxxxxxxx",
+    "GITLAB_PROJECT_ID": "12345678"
+  }
+}
 ```
-
-### Other Agents
-
-```bash
-./install.sh sonarqube gemini   # Gemini CLI
-./install.sh sonarqube codex    # Codex CLI
-./install.sh sonarqube cursor   # Cursor
-```
-
----
-
-## Configuration
-
-Create `.env` in your project's config directory:
-
-```bash
-SONAR_HOST_URL=https://sonarqube.example.com
-SONAR_TOKEN=sqa_xxxxxxxxxxxxx
-SONAR_PROJECT_KEY=my-project
-```
-
----
-
-## MCP Tools
-
-| Tool | Description |
-|------|-------------|
-| `sonar_fetch_issues` | Fetch open issues (severity, newCode, file) |
-| `sonar_quality_gate` | Check if project passes/fails quality gate |
-| `sonar_metrics` | Get coverage, duplications, complexity, bugs count |
-| `sonar_hotspots` | Fetch security hotspots to review |
-| `sonar_rule_details` | Get rule explanation and fix examples |
-| `sonar_run_analysis` | Run SonarQube scan via Gradle |
 
 ---
 
 ## Usage Examples
 
+### SonarQube
 ```
-# Issues
-show me sonar issues
-fix high severity issues
-fetch blocker issues for new code
-
-# Quality gate
+fetch sonar issues from new code
 check quality gate status
-is the quality gate passing?
-
-# Metrics
-show project metrics
-what's the code coverage?
-
-# Security
 show security hotspots
-review security hotspots
-
-# Rules
 explain rule java:S2140
-what does rule python:S1234 mean?
+```
+
+### GitLab Issues
+```
+fetch gitlab issues by v1.31.0 milestone
+show issue 45 details
+assign issue 45 to alice
+```
+
+### GitLab MRs
+```
+list open merge requests
+show MR 123 discussions
+resolve discussion on MR 123
 ```
 
 ---
@@ -102,15 +82,13 @@ what does rule python:S1234 mean?
 
 ```
 awesome-agent-toolkit/
-├── core/sonarqube/
-│   ├── scripts/           # fetch-issues, quality-gate, metrics, hotspots, rule-details
-│   └── mcp-server/        # Universal MCP server
+├── core/
+│   ├── sonarqube/scripts/    # fetch-issues, quality-gate, metrics
+│   └── gitlab/scripts/       # list-issues, list-mrs, post-comment
 ├── adapters/
-│   ├── claude/            # Plugin, skills, hooks
-│   ├── gemini/            # GEMINI.md, mcp-config
-│   ├── codex/             # Skills
-│   └── cursor/            # .cursorrules
-└── install.sh
+│   ├── claude/               # Skills, hooks for Claude Code
+│   └── codex/                # Skills for Codex CLI
+└── .claude-plugin/           # Marketplace metadata
 ```
 
 ## License

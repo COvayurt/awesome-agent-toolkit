@@ -1,0 +1,21 @@
+{
+  "name": "gitlab-mr-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for GitLab Merge Request operations",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "keywords": [
+    "gitlab",
+    "merge-request",
+    "mcp",
+    "model-context-protocol"
+  ],
+  "author": "COVayurt",
+  "license": "MIT"
+}

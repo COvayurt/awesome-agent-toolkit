@@ -1,8 +1,6 @@
 #!/bin/bash
-# List GitLab Issues
-# Usage: ./list-issues.sh [state] [milestone] [per_page]
-# state: opened, closed, all (default: opened)
-# milestone: milestone title or "none" or "any" (optional)
+# Get GitLab Issue details
+# Usage: ./get-issue-details.sh <issue_iid>
 
 set -e
 
@@ -11,9 +9,13 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
     source "$SCRIPT_DIR/.env"
 fi
 
-STATE="${1:-opened}"
-MILESTONE="${2:-}"
-PER_PAGE="${3:-20}"
+ISSUE_IID="${1}"
+
+if [ -z "$ISSUE_IID" ]; then
+    echo "Error: Issue IID is required"
+    echo "Usage: ./get-issue-details.sh <issue_iid>"
+    exit 1
+fi
 
 if [ -z "$GITLAB_HOST_URL" ] || [ -z "$GITLAB_TOKEN" ] || [ -z "$GITLAB_PROJECT_ID" ]; then
     echo "Error: Missing required environment variables"
@@ -22,29 +24,28 @@ if [ -z "$GITLAB_HOST_URL" ] || [ -z "$GITLAB_TOKEN" ] || [ -z "$GITLAB_PROJECT_
 fi
 
 ENCODED_PROJECT_ID=$(echo "$GITLAB_PROJECT_ID" | sed 's/\//%2F/g')
-API_URL="${GITLAB_HOST_URL}/api/v4/projects/${ENCODED_PROJECT_ID}/issues"
+API_URL="${GITLAB_HOST_URL}/api/v4/projects/${ENCODED_PROJECT_ID}/issues/${ISSUE_IID}"
 
-# Build query params
-PARAMS="state=${STATE}&per_page=${PER_PAGE}&order_by=updated_at&sort=desc"
-
-if [ -n "$MILESTONE" ]; then
-    ENCODED_MILESTONE=$(printf '%s' "$MILESTONE" | jq -sRr @uri)
-    PARAMS="${PARAMS}&milestone=${ENCODED_MILESTONE}"
-fi
-
-curl -s --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
-    "${API_URL}?${PARAMS}" | \
-    jq '[.[] | {
+curl -s --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" "${API_URL}" | \
+    jq '{
         iid: .iid,
         title: .title,
+        description: .description,
         state: .state,
         author: .author.username,
         assignees: [.assignees[].username],
         labels: .labels,
         milestone: .milestone.title,
+        milestone_id: .milestone.id,
+        due_date: .due_date,
         created_at: .created_at,
         updated_at: .updated_at,
+        closed_at: .closed_at,
+        closed_by: .closed_by.username,
         web_url: .web_url,
+        time_stats: .time_stats,
+        task_completion_status: .task_completion_status,
         has_tasks: .has_tasks,
-        task_status: .task_status
-    }]'
+        task_status: .task_status,
+        weight: .weight
+    }'

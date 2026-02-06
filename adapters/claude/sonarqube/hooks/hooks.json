@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "sonar|fix.*issue|code.*smell|bug.*scan|quality.*gate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ./hooks/prompt-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -7,9 +7,7 @@
 # Examples:
 #   ./install.sh sonarqube          # Auto-detect agent
 #   ./install.sh sonarqube claude   # Install for Claude Code
-#   ./install.sh sonarqube gemini   # Install for Gemini CLI
 #   ./install.sh sonarqube codex    # Install for Codex CLI
-#   ./install.sh sonarqube cursor   # Install for Cursor
 
 set -euo pipefail
 
@@ -31,12 +29,8 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 detect_agent() {
     if [ -d ".claude" ] || [ -f "CLAUDE.md" ]; then
         echo "claude"
-    elif [ -d ".gemini" ] || [ -f "GEMINI.md" ]; then
-        echo "gemini"
     elif [ -d ".codex" ] || [ -f "$HOME/.codex/config.toml" ]; then
         echo "codex"
-    elif [ -d ".cursor" ]; then
-        echo "cursor"
     else
         echo "unknown"
     fi
@@ -54,7 +48,7 @@ fi
 if [ "$AGENT" = "auto" ]; then
     AGENT=$(detect_agent)
     if [ "$AGENT" = "unknown" ]; then
-        log_warn "Could not auto-detect agent. Please specify: claude, gemini, codex, or cursor"
+        log_warn "Could not auto-detect agent. Please specify: claude or codex"
         echo "Usage: ./install.sh $PLUGIN [agent]"
         exit 1
     fi
@@ -64,7 +58,7 @@ fi
 # Validate adapter exists
 if [ ! -d "$TOOLKIT_DIR/adapters/$AGENT" ]; then
     log_error "Adapter for '$AGENT' not found"
-    echo "Available adapters: claude, gemini, codex, cursor"
+    echo "Available adapters: claude, codex"
     exit 1
 fi
 
@@ -97,88 +91,38 @@ case "$AGENT" in
         log_info "Claude Code plugin installed to .claude/"
         log_info "Next steps:"
         echo "  1. Copy .claude/.env.example to .claude/.env"
-        echo "  2. Fill in your SonarQube credentials"
+        echo "  2. Fill in your credentials"
         echo "  3. Restart Claude Code"
         ;;
 
-    gemini)
-        # Copy context file
-        cp "$TOOLKIT_DIR/adapters/gemini/GEMINI.md" .
-
-        # Copy MCP config (user needs to merge into ~/.gemini/settings.json)
-        mkdir -p .gemini
-        cp "$TOOLKIT_DIR/adapters/gemini/mcp-config.json" .gemini/
-
-        # Copy core scripts
-        mkdir -p .gemini/scripts
-        cp -r "$TOOLKIT_DIR/core/$PLUGIN/scripts/"* .gemini/scripts/
-        chmod +x .gemini/scripts/*.sh
-
-        # Copy env example
-        cp "$TOOLKIT_DIR/core/$PLUGIN/.env.example" .gemini/.env.example
-
-        log_info "Gemini CLI integration installed"
-        log_info "Next steps:"
-        echo "  1. Copy .gemini/.env.example to .gemini/.env"
-        echo "  2. Fill in your SonarQube credentials"
-        echo "  3. Add MCP server config to ~/.gemini/settings.json"
-        ;;
-
     codex)
-        # Copy skill file
-        mkdir -p ~/.codex/skills
-        cp "$TOOLKIT_DIR/adapters/codex/skills/"* ~/.codex/skills/
+        # Copy skills to ~/.agents/skills/ (Codex skill location)
+        mkdir -p ~/.agents/skills
 
-        # Copy MCP config (user needs to merge into ~/.codex/config.toml)
-        log_info "MCP config template saved. Merge into ~/.codex/config.toml:"
-        cat "$TOOLKIT_DIR/adapters/codex/mcp-config.toml"
+        # Copy each skill directory
+        for skill_dir in "$TOOLKIT_DIR/adapters/codex/skills/"*/; do
+            skill_name=$(basename "$skill_dir")
+            log_info "Installing skill: $skill_name"
+            cp -r "$skill_dir" ~/.agents/skills/
+            chmod +x ~/.agents/skills/"$skill_name"/scripts/*.sh 2>/dev/null || true
+        done
 
-        # Copy core scripts
-        mkdir -p .codex/scripts
-        cp -r "$TOOLKIT_DIR/core/$PLUGIN/scripts/"* .codex/scripts/
-        chmod +x .codex/scripts/*.sh
-
-        # Copy env example
-        cp "$TOOLKIT_DIR/core/$PLUGIN/.env.example" .codex/.env.example
-
-        log_info "Codex CLI integration installed"
+        log_info "Codex CLI skills installed to ~/.agents/skills/"
         log_info "Next steps:"
-        echo "  1. Copy .codex/.env.example to .codex/.env"
-        echo "  2. Fill in your SonarQube credentials"
-        echo "  3. Merge MCP config into ~/.codex/config.toml"
-        ;;
-
-    cursor)
-        # Copy rules file
-        if [ -f ".cursorrules" ]; then
-            log_warn ".cursorrules already exists, appending..."
-            echo "" >> .cursorrules
-            cat "$TOOLKIT_DIR/adapters/cursor/.cursorrules" >> .cursorrules
-        else
-            cp "$TOOLKIT_DIR/adapters/cursor/.cursorrules" .
-        fi
-
-        # Copy MCP config
-        mkdir -p .cursor
-        cp "$TOOLKIT_DIR/adapters/cursor/mcp.json" .cursor/
-
-        # Copy core scripts
-        mkdir -p .cursor/scripts
-        cp -r "$TOOLKIT_DIR/core/$PLUGIN/scripts/"* .cursor/scripts/
-        chmod +x .cursor/scripts/*.sh
-
-        # Copy env example
-        cp "$TOOLKIT_DIR/core/$PLUGIN/.env.example" .cursor/.env.example
-
-        log_info "Cursor integration installed"
-        log_info "Next steps:"
-        echo "  1. Copy .cursor/.env.example to .cursor/.env"
-        echo "  2. Fill in your SonarQube credentials"
-        echo "  3. Restart Cursor"
+        echo "  1. Enable skills: codex --enable skills"
+        echo "  2. Add env vars to your shell profile (~/.bashrc or ~/.zshrc):"
+        echo "     export GITLAB_HOST_URL=https://gitlab.com"
+        echo "     export GITLAB_TOKEN=glpat-xxx"
+        echo "     export GITLAB_PROJECT_ID=12345"
+        echo "     export SONAR_HOST_URL=https://sonarqube.example.com"
+        echo "     export SONAR_TOKEN=sqa_xxx"
+        echo "     export SONAR_PROJECT_KEY=my-project"
+        echo "  3. Restart your shell and Codex"
         ;;
 
     *)
         log_error "Unknown agent: $AGENT"
+        echo "Supported agents: claude, codex"
         exit 1
         ;;
 esac
