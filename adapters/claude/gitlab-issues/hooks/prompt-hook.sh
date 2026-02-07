@@ -21,7 +21,7 @@ PROMPT=$(echo "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin)
 PROMPT_LOWER=$(echo "$PROMPT" | tr '[:upper:]' '[:lower:]')
 
 # Check if this is a GitLab issues request
-if [[ ! "$PROMPT_LOWER" =~ (gitlab.*issue|issue.*gitlab|list.*issue|show.*issue|fetch.*issue|my.*issue|open.*issue|milestone) ]]; then
+if [[ ! "$PROMPT_LOWER" =~ (gitlab.*issue|issue.*gitlab|list.*issue|show.*issue|fetch.*issue|my.*issue|open.*issue|milestone|create.*issue|new.*issue|add.*issue|sub.?issue|child.*issue) ]]; then
     exit 0
 fi
 
@@ -92,6 +92,8 @@ except Exception as e:
 cat << 'EOF'
 
 **Available Scripts:** Use bash scripts in `core/scripts/` for more operations:
+- `create-issue.sh <json_payload>` - Create new issue
+- `create-sub-issue.sh <parent_iid> <json_payload>` - Create sub-issue linked to parent
 - `list-issues.sh [state] [milestone]` - List issues
 - `get-issue-details.sh <iid>` - Get issue details
 - `post-issue-comment.sh <iid> <body>` - Add comment

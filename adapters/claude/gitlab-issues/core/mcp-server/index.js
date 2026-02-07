@@ -379,6 +379,109 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["issue_iid", "source_branch"],
         },
       },
+      {
+        name: "gitlab_create_issue",
+        description:
+          "Create a new issue in the GitLab project. Returns the created issue details including IID and URL.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            title: {
+              type: "string",
+              description: "The title of the issue (required)",
+            },
+            description: {
+              type: "string",
+              description:
+                "Issue description. Supports GitLab-flavored Markdown.",
+            },
+            labels: {
+              type: "string",
+              description: "Comma-separated list of labels",
+            },
+            assignee_ids: {
+              type: "array",
+              items: { type: "number" },
+              description: "Array of user IDs to assign",
+            },
+            milestone_id: {
+              type: "number",
+              description: "Milestone ID to assign",
+            },
+            due_date: {
+              type: "string",
+              description: "Due date in YYYY-MM-DD format",
+            },
+            weight: {
+              type: "number",
+              description: "Issue weight (numeric)",
+            },
+            confidential: {
+              type: "boolean",
+              description: "Whether the issue is confidential",
+              default: false,
+            },
+            issue_type: {
+              type: "string",
+              enum: ["issue", "incident", "task"],
+              description: "Type of issue",
+              default: "issue",
+            },
+          },
+          required: ["title"],
+        },
+      },
+      {
+        name: "gitlab_create_sub_issue",
+        description:
+          "Create a sub-issue (child issue) linked to a parent issue. Creates the issue and establishes a parent-child relationship. On GitLab Premium 16.0+ uses native parent/child links, otherwise falls back to 'relates_to' link.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            parent_issue_iid: {
+              type: "number",
+              description:
+                "The internal ID (IID) of the parent issue to link to",
+            },
+            title: {
+              type: "string",
+              description: "The title of the sub-issue (required)",
+            },
+            description: {
+              type: "string",
+              description:
+                "Sub-issue description. Supports GitLab-flavored Markdown.",
+            },
+            labels: {
+              type: "string",
+              description: "Comma-separated list of labels",
+            },
+            assignee_ids: {
+              type: "array",
+              items: { type: "number" },
+              description: "Array of user IDs to assign",
+            },
+            milestone_id: {
+              type: "number",
+              description: "Milestone ID to assign",
+            },
+            due_date: {
+              type: "string",
+              description: "Due date in YYYY-MM-DD format",
+            },
+            weight: {
+              type: "number",
+              description: "Issue weight (numeric)",
+            },
+            confidential: {
+              type: "boolean",
+              description: "Whether the sub-issue is confidential",
+              default: false,
+            },
+          },
+          required: ["parent_issue_iid", "title"],
+        },
+      },
     ],
   };
 });
@@ -490,6 +593,38 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           args.target_branch || "",
         ]);
         break;
+
+      case "gitlab_create_issue": {
+        const createPayload = {};
+        createPayload.title = args.title;
+        if (args.description !== undefined) createPayload.description = args.description;
+        if (args.labels !== undefined) createPayload.labels = args.labels;
+        if (args.assignee_ids !== undefined) createPayload.assignee_ids = args.assignee_ids;
+        if (args.milestone_id !== undefined) createPayload.milestone_id = args.milestone_id;
+        if (args.due_date !== undefined) createPayload.due_date = args.due_date;
+        if (args.weight !== undefined) createPayload.weight = args.weight;
+        if (args.confidential !== undefined) createPayload.confidential = args.confidential;
+        if (args.issue_type !== undefined) createPayload.issue_type = args.issue_type;
+        result = runScript("create-issue.sh", [JSON.stringify(createPayload)]);
+        break;
+      }
+
+      case "gitlab_create_sub_issue": {
+        const subPayload = {};
+        subPayload.title = args.title;
+        if (args.description !== undefined) subPayload.description = args.description;
+        if (args.labels !== undefined) subPayload.labels = args.labels;
+        if (args.assignee_ids !== undefined) subPayload.assignee_ids = args.assignee_ids;
+        if (args.milestone_id !== undefined) subPayload.milestone_id = args.milestone_id;
+        if (args.due_date !== undefined) subPayload.due_date = args.due_date;
+        if (args.weight !== undefined) subPayload.weight = args.weight;
+        if (args.confidential !== undefined) subPayload.confidential = args.confidential;
+        result = runScript("create-sub-issue.sh", [
+          args.parent_issue_iid,
+          JSON.stringify(subPayload),
+        ]);
+        break;
+      }
 
       default:
         throw new Error(`Unknown tool: ${name}`);

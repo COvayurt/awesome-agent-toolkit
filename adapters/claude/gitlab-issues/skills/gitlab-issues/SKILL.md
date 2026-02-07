@@ -5,7 +5,7 @@ description: Use this skill when the user mentions "gitlab issues", "list issues
 
 # GitLab Issues Integration
 
-Manage GitLab issues using bash scripts. List issues, read comments, post updates, assign people, and create merge requests from issues.
+Manage GitLab issues using bash scripts. Create issues, create sub-issues, list issues, read comments, post updates, assign people, and create merge requests from issues.
 
 ## How to Use
 
@@ -32,6 +32,39 @@ If empty, add them to `~/.claude/settings.json` under `env`:
 ## Available Commands
 
 Set `PLUGIN_DIR=~/.claude/plugins/cache/awesome-agent-toolkit/gitlab-issues/1.2.1`
+
+### Create Issue
+
+```bash
+# Create a simple issue (title only)
+bash $PLUGIN_DIR/core/scripts/create-issue.sh '{"title": "Fix login bug"}'
+
+# Create issue with description and labels
+bash $PLUGIN_DIR/core/scripts/create-issue.sh '{"title": "Add dark mode", "description": "Implement dark mode toggle in settings", "labels": "feature,ui"}'
+
+# Create issue with full details
+bash $PLUGIN_DIR/core/scripts/create-issue.sh '{"title": "API rate limiting", "description": "Add rate limiting to public endpoints", "labels": "backend,security", "assignee_ids": [12], "milestone_id": 8, "due_date": "2025-03-01", "weight": 3}'
+
+# Create a confidential issue
+bash $PLUGIN_DIR/core/scripts/create-issue.sh '{"title": "Security vulnerability", "description": "Details...", "confidential": true}'
+```
+
+Returns created issue details including IID, URL, assignees, and labels.
+
+### Create Sub-Issue (Child Issue)
+
+```bash
+# Create a sub-issue linked to parent issue #45
+bash $PLUGIN_DIR/core/scripts/create-sub-issue.sh 45 '{"title": "Implement login form validation"}'
+
+# Create sub-issue with description and labels
+bash $PLUGIN_DIR/core/scripts/create-sub-issue.sh 45 '{"title": "Add unit tests for auth", "description": "Cover edge cases", "labels": "testing"}'
+
+# Create sub-issue with assignee
+bash $PLUGIN_DIR/core/scripts/create-sub-issue.sh 45 '{"title": "Update API docs", "assignee_ids": [15], "labels": "docs"}'
+```
+
+Creates a new issue and links it as a child of the parent issue. On GitLab Premium 16.0+ uses native parent/child hierarchy; otherwise falls back to a "relates_to" link.
 
 ### List Issues
 
@@ -136,6 +169,22 @@ When user asks to assign an issue:
 
 1. Run: `bash $PLUGIN_DIR/core/scripts/list-project-members.sh` to find user ID
 2. Run: `bash $PLUGIN_DIR/core/scripts/update-issue.sh <iid> --assignee-ids "<user_id>"`
+
+### 4. Create Issue with Assignment
+
+When user asks to create and assign an issue:
+
+1. Run: `bash $PLUGIN_DIR/core/scripts/list-project-members.sh` to find user ID
+2. Run: `bash $PLUGIN_DIR/core/scripts/list-milestones.sh` to find milestone ID (if needed)
+3. Run: `bash $PLUGIN_DIR/core/scripts/create-issue.sh '{"title": "...", "assignee_ids": [<user_id>], "milestone_id": <milestone_id>}'`
+
+### 5. Break Down Issue into Sub-Issues
+
+When user asks to split an issue into tasks:
+
+1. Run: `bash $PLUGIN_DIR/core/scripts/get-issue-details.sh <parent_iid>` to understand the parent
+2. For each sub-task, run: `bash $PLUGIN_DIR/core/scripts/create-sub-issue.sh <parent_iid> '{"title": "Sub-task title", "description": "..."}'`
+3. Verify with: `bash $PLUGIN_DIR/core/scripts/get-issue-details.sh <parent_iid>` to see linked issues
 
 ## Output Format
 
