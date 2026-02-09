@@ -1,0 +1,11 @@
+{
+  "name": "gitlab-mr",
+  "description": "GitLab Merge Request integration - list MRs, read comments, post feedback, resolve discussions",
+  "version": "1.3.0",
+  "author": {
+    "name": "COVayurt"
+  },
+  "repository": "https://github.com/covayurt/awesome-agent-toolkit",
+  "license": "MIT",
+  "keywords": ["gitlab", "merge-request", "code-review", "collaboration"]
+}

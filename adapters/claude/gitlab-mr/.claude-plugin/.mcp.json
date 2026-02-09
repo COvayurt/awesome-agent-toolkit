@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "gitlab": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/core/mcp-server/index.js"],
+      "env": {
+        "GITLAB_HOST_URL": "${GITLAB_HOST_URL}",
+        "GITLAB_TOKEN": "${GITLAB_TOKEN}",
+        "GITLAB_PROJECT_ID": "${GITLAB_PROJECT_ID}"
+      }
+    }
+  }
+}

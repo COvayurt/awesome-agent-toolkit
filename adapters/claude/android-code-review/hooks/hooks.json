@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "review.*code|review.*change|review.*branch|review.*mr|code.*review|review.*my|android.*review",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ./hooks/prompt-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

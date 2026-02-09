@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "gitlab.*issue|issue.*gitlab|list.*issue|milestone|fetch.*issue|assign.*issue|update.*issue|issue.*comment|my.*issue|open.*issue|show.*issue|create.*issue|new.*issue|add.*issue|sub.?issue|child.*issue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ./hooks/prompt-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "sonarqube": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/core/mcp-server/index.js"],
+      "env": {
+        "SONAR_HOST_URL": "${SONAR_HOST_URL}",
+        "SONAR_TOKEN": "${SONAR_TOKEN}",
+        "SONAR_PROJECT_KEY": "${SONAR_PROJECT_KEY}"
+      }
+    }
+  }
+}

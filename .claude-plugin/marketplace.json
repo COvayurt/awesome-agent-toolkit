@@ -6,51 +6,48 @@
   },
   "plugins": [
     {
-      "name": "sonarqube",
-      "source": "./adapters/claude",
-      "description": "SonarQube integration - fetch issues, run analysis, auto-inject context into prompts",
-      "version": "1.0.0",
-      "author": {
-        "name": "COVayurt"
-      },
-      "license": "MIT",
-      "keywords": [
-        "sonarqube",
-        "code-quality",
-        "static-analysis"
-      ]
-    },
-    {
       "name": "gitlab-mr",
-      "source": "./adapters/claude",
+      "source": "./adapters/claude/gitlab-mr",
       "description": "GitLab Merge Request integration - list MRs, read comments, post feedback, resolve discussions",
-      "version": "1.0.0",
+      "version": "1.3.0",
       "author": {
         "name": "COVayurt"
       },
       "license": "MIT",
-      "keywords": [
-        "gitlab",
-        "merge-request",
-        "code-review",
-        "collaboration"
-      ]
+      "keywords": ["gitlab", "merge-request", "code-review", "collaboration"]
     },
     {
       "name": "gitlab-issues",
-      "source": "./adapters/claude",
+      "source": "./adapters/claude/gitlab-issues",
       "description": "GitLab Issues integration - list issues, manage comments, update descriptions, assign milestones and people, create MRs",
-      "version": "1.0.0",
+      "version": "1.2.1",
       "author": {
         "name": "COVayurt"
       },
       "license": "MIT",
-      "keywords": [
-        "gitlab",
-        "issues",
-        "project-management",
-        "collaboration"
-      ]
+      "keywords": ["gitlab", "issues", "project-management", "collaboration"]
+    },
+    {
+      "name": "sonarqube",
+      "source": "./adapters/claude/sonarqube",
+      "description": "SonarQube integration - fetch issues, run analysis, check quality gate, view metrics",
+      "version": "1.2.1",
+      "author": {
+        "name": "COVayurt"
+      },
+      "license": "MIT",
+      "keywords": ["sonarqube", "code-quality", "static-analysis"]
+    },
+    {
+      "name": "android-code-review",
+      "source": "./adapters/claude/android-code-review",
+      "description": "Senior architect code review - reads branch diff and posts inline comments on merge requests",
+      "version": "1.1.0",
+      "author": {
+        "name": "COVayurt"
+      },
+      "license": "MIT",
+      "keywords": ["code-review", "architecture", "android", "merge-request"]
     }
   ]
 }
