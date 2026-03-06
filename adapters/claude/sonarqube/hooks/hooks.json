@@ -1,12 +1,35 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-start-hook.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/post-tool-hook.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "matcher": "sonar|fix.*issue|code.*smell|bug.*scan|quality.*gate",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ./hooks/prompt-hook.sh"
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/prompt-hook.sh"
           }
         ]
       }

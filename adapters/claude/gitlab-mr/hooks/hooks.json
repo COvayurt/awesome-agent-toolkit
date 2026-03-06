@@ -1,12 +1,23 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-start-hook.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "matcher": "gitlab.*mr|merge.*request|list.*mr|mr.*comment|review.*comment|resolve.*discussion|code.*review|show.*mr|my.*mr|open.*mr",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ./hooks/prompt-hook.sh"
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/prompt-hook.sh"
           }
         ]
       }
