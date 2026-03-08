@@ -13,7 +13,6 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "gitlab.*mr|merge.*request|list.*mr|mr.*comment|review.*comment|resolve.*discussion|code.*review|show.*mr|my.*mr|open.*mr",
         "hooks": [
           {
             "type": "command",
