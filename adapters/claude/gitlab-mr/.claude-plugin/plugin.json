@@ -1,7 +1,7 @@
 {
   "name": "gitlab-mr",
   "description": "GitLab Merge Request integration - list MRs, read comments, post feedback, resolve discussions",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "author": {
     "name": "COVayurt"
   },

@@ -1,0 +1,11 @@
+{
+  "name": "android-code-review",
+  "description": "Senior architect code review - reads branch diff and posts inline comments on merge requests",
+  "version": "1.1.1",
+  "author": {
+    "name": "COVayurt"
+  },
+  "repository": "https://github.com/covayurt/awesome-agent-toolkit",
+  "license": "MIT",
+  "keywords": ["code-review", "architecture", "android", "merge-request"]
+}
