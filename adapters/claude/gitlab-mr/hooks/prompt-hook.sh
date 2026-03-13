@@ -85,13 +85,13 @@ except Exception as e:
     print(f'Error parsing MRs: {e}')
 "
 
-cat << 'EOF'
+cat << EOF
 
-**Available Scripts:** Use bash scripts in `core/scripts/` for more operations:
-- `list-mrs.sh [state]` - List merge requests
-- `get-mr-details.sh <iid>` - Get MR details
-- `get-mr-discussions.sh <iid>` - Get MR discussions/comments
-- `post-mr-comment.sh <iid> <body>` - Add comment to MR
-- `reply-to-discussion.sh <iid> <discussion_id> <body>` - Reply to discussion
-- `resolve-discussion.sh <iid> <discussion_id>` - Resolve discussion
+**Available Scripts:** Use bash scripts in \`$CORE_SCRIPTS/\` for more operations:
+- \`$CORE_SCRIPTS/list-mrs.sh [state]\` - List merge requests
+- \`$CORE_SCRIPTS/get-mr-details.sh <iid>\` - Get MR details
+- \`$CORE_SCRIPTS/get-mr-discussions.sh <iid>\` - Get MR discussions/comments
+- \`$CORE_SCRIPTS/post-mr-comment.sh <iid> <body>\` - Add comment to MR
+- \`$CORE_SCRIPTS/reply-to-discussion.sh <iid> <discussion_id> <body>\` - Reply to discussion
+- \`$CORE_SCRIPTS/resolve-discussion.sh <iid> <discussion_id>\` - Resolve discussion
 EOF

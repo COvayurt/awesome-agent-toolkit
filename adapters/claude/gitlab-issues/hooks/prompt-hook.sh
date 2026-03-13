@@ -89,13 +89,13 @@ except Exception as e:
     print(f'Error parsing issues: {e}')
 "
 
-cat << 'EOF'
+cat << EOF
 
-**Available Scripts:** Use bash scripts in `core/scripts/` for more operations:
-- `create-issue.sh <json_payload>` - Create new issue
-- `create-sub-issue.sh <parent_iid> <json_payload>` - Create sub-issue linked to parent
-- `list-issues.sh [state] [milestone]` - List issues
-- `get-issue-details.sh <iid>` - Get issue details
-- `post-issue-comment.sh <iid> <body>` - Add comment
-- `update-issue.sh <iid> [options]` - Update issue
+**Available Scripts:** Use bash scripts in \`$CORE_SCRIPTS/\` for more operations:
+- \`$CORE_SCRIPTS/create-issue.sh <json_payload>\` - Create new issue
+- \`$CORE_SCRIPTS/create-sub-issue.sh <parent_iid> <json_payload>\` - Create sub-issue linked to parent
+- \`$CORE_SCRIPTS/list-issues.sh [state] [milestone]\` - List issues
+- \`$CORE_SCRIPTS/get-issue-details.sh <iid>\` - Get issue details
+- \`$CORE_SCRIPTS/post-issue-comment.sh <iid> <body>\` - Add comment
+- \`$CORE_SCRIPTS/update-issue.sh <iid> [options]\` - Update issue
 EOF
